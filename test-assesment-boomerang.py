@@ -11,9 +11,9 @@ import math
 
 def boomerang_count(points) -> int:
     res = 0
-    map = {}
 
     for i, a in enumerate(points):
+        map = {}
         for j, b in enumerate(points):
             if i == j:
                 continue
@@ -21,14 +21,15 @@ def boomerang_count(points) -> int:
             map[d] = map.get(d, 0) + 1
 
         for val in map.values():
-            res += val * (val-1)
-        map = {}
+            res += val * (val-1) / 2
 
-    return res / 2
+    return res
 
 
 def get_distance(a, b):
-    return (a[0] - b[0])**2 + (a[1] - b[1])**2
+    f = (b[0] - a[0]) ** 2
+    s = (b[1] - a[1]) ** 2
+    return f if f else s
 
 # *********************************************************
 # Example test cases that must pass.
@@ -41,13 +42,12 @@ def get_distance(a, b):
 #
 # A--B--C.
 # Boomerangs: ABC
-
-
-assert boomerang_count((
+count = boomerang_count((
     (0, 0),
     (1, 0),
     (2, 0),
-)) == 1
+))
+assert count == 1
 
 
 # Equilateral triangle:
@@ -62,11 +62,12 @@ assert boomerang_count((
 #   [v] ABC - correct lines has the same length   (1,7 - 1,7)
 #   [-] ACB - incorrect lines not the same length (2   - 1,7)
 #   [-] CAB - incorrect lines not the same length (2   - 1,7)
-assert boomerang_count((
+count = boomerang_count((
     (0, 0),
     (1, math.sqrt(3)),
     (2, 0),
-)) == 1
+))
+assert count == 1
 
 
 # Hub and Spoke:
@@ -75,9 +76,11 @@ assert boomerang_count((
 #    |
 # B--A--D
 # Boomerangs: BAC, CAD, BAD, BCD
-assert boomerang_count((
+# Missed Boomerangs: BCA, ACB, DCA, ACD
+count = boomerang_count((
     ( 0, 0),
     (-1, 0),
     ( 0, 1),
     ( 1, 0),
-)) == 4
+))
+assert count == 8
