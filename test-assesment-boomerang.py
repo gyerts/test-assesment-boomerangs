@@ -9,26 +9,46 @@ import math
 # formed from a provided list of stars.
 
 
+# In case that anatomy of app matrix is 2 mirrored merged matrix,
+# that is why we do not need to make calculation again
+# for already calculated values
+class Cache:
+    def __init__(self):
+        self.cache = {}
+
+    def get_map(self, i):
+        return self.cache.get(i, {})
+
+    def add(self, i, distance):
+        if i not in self.cache:
+            self.cache[i] = {}
+        self.cache[i][distance] = self.cache[i].get(distance, 0) + 1
+
+
 def boomerang_count(points) -> int:
     res = 0
+    cache = Cache()
 
     for i, a in enumerate(points):
-        map = {}
-        for j, b in enumerate(points):
-            if i == j:
-                continue
+        map = cache.get_map(i)
+
+        # make iteration in the first half of matrix only,
+        # skip already iterated and cached steps
+        for j, b in enumerate(points[i + 1:], i + 1):
             d = get_distance(a, b)
             map[d] = map.get(d, 0) + 1
+            cache.add(j, d)
 
         for val in map.values():
-            res += val * (val-1) / 2
-
+            # if vertex contains 3 entries, it means 3 combinations available
+            # if vertex contains 2 entries, it means only 1 combination available
+            res += val * (val - 1) / 2
     return res
 
 
 def get_distance(a, b):
-    f = (b[0] - a[0]) ** 2
-    s = (b[1] - a[1]) ** 2
+    f = abs(b[0] - a[0])
+    s = abs(b[1] - a[1])
     return f if f else s
 
 # *********************************************************
